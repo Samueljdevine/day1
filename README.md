@@ -39,6 +39,14 @@ npm run build
 
 Type-checks with `tsc`, bundles to `dist/`, and generates the web manifest plus the service worker that precaches every asset. The whole build is well under 200 KB.
 
+## Deploy to GitHub Pages
+
+Pushing to `main` runs [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which tests, builds with `BASE_PATH=/day1/` and publishes `dist/` to GitHub Pages at `https://samueljdevine.github.io/day1/`. That URL is HTTPS, so the app installs to the home screen and works offline.
+
+Requirements: GitHub Pages must be enabled on the repository (Settings → Pages → Source: GitHub Actions). On a free GitHub plan Pages only works for public repositories.
+
+The base path is read from the `BASE_PATH` environment variable at build time and defaults to `/`, so local `npm run dev` / `npm run preview` are unchanged.
+
 ## Serve `dist` on your home network (test on the phone)
 
 The service worker needs a secure context. `localhost` counts, but a phone on the same Wi-Fi does not, so the app will still run over plain HTTP from a LAN address, but it will not install or work offline until it is served over HTTPS. Two options:
