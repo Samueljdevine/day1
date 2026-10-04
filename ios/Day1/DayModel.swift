@@ -32,7 +32,7 @@ final class DayModel {
         reload()
     }
 
-    func reload(now: Date = Date()) {
+    func reload(now: Date = DebugClock.now()) {
         dateKey = Routine.dateKey(now)
         tomorrowKey = Routine.dateKey(Routine.addDays(now, 1))
         top3Today = store.top3(for: dateKey)
@@ -86,7 +86,7 @@ final class DayModel {
         }
     }
 
-    private func refreshStreak(now: Date = Date()) {
+    private func refreshStreak(now: Date = DebugClock.now()) {
         streak = Routine.learningStreak(hasEntry: store.hasLearnEntry, today: now)
     }
 

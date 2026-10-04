@@ -124,6 +124,100 @@ struct LearningSection: View {
     }
 }
 
+/// Thin bar under the header: how far through the 100 days.
+struct ProgramBar: View {
+    let fraction: Double
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(Color(uiColor: .separator).opacity(0.6))
+                Capsule().fill(Color.secondary).frame(width: max(3, geo.size.width * fraction))
+            }
+        }
+        .frame(height: 3)
+        .accessibilityLabel("Program progress")
+        .accessibilityValue("\(Int((fraction * 100).rounded())) percent")
+    }
+}
+
+/// Today at a glance: every block as a coloured segment sized by duration,
+/// past blocks dimmed, a marker for now. Tap a segment to preview it.
+struct DayStrip: View {
+    let blocks: [Block]
+    let live: Block
+    let now: Date
+    let previewed: Block?
+    let onTap: (Block) -> Void
+
+    @Environment(\.colorScheme) private var scheme
+    private let gap: CGFloat = 2
+
+    var body: some View {
+        GeometryReader { geo in
+            let total = blocks.reduce(0.0) { $0 + $1.duration }
+            let usable = max(0, geo.size.width - gap * CGFloat(max(0, blocks.count - 1)))
+            ZStack(alignment: .leading) {
+                HStack(spacing: gap) {
+                    ForEach(blocks) { block in
+                        let isCurrent = !live.isSleep && block.number == live.number
+                        let isPast = !isCurrent && now >= block.end
+                        RoundedRectangle(cornerRadius: 3, style: .continuous)
+                            .fill(block.category.text(for: scheme))
+                            .opacity(isCurrent ? 1 : (isPast ? 0.28 : 0.9))
+                            .frame(width: total > 0 ? usable * block.duration / total : 0)
+                            .scaleEffect(y: isCurrent ? 1.35 : 1)
+                            .overlay {
+                                if previewed?.number == block.number {
+                                    RoundedRectangle(cornerRadius: 3).stroke(Color.primary, lineWidth: 2)
+                                }
+                            }
+                            .contentShape(Rectangle().inset(by: -8))
+                            .onTapGesture { onTap(block) }
+                            .accessibilityLabel("\(block.displayTitle), \(block.startLabel) to \(block.endLabel)")
+                            .accessibilityAddTraits(.isButton)
+                    }
+                }
+                .frame(height: geo.size.height)
+                if let first = blocks.first, let last = blocks.last, !live.isSleep {
+                    let span = last.end.timeIntervalSince(first.start)
+                    let frac = span > 0 ? min(1, max(0, now.timeIntervalSince(first.start) / span)) : 0
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.primary)
+                        .frame(width: 3, height: geo.size.height + 8)
+                        .background(RoundedRectangle(cornerRadius: 3).fill(Color(uiColor: .systemBackground)).padding(-2))
+                        .offset(x: geo.size.width * frac - 1.5)
+                        .allowsHitTesting(false)
+                }
+            }
+            // The marker is taller than the strip; keep the strip's own height and let it overhang evenly.
+            .frame(height: geo.size.height)
+        }
+        .frame(height: 14)
+    }
+}
+
+/// "TODAY            3 OF 14 DONE"
+struct DayHeader: View {
+    let done: Int
+    let total: Int
+
+    var body: some View {
+        HStack {
+            Text("Today")
+            Spacer()
+            Text("\(done) of \(total) done").monospacedDigit()
+        }
+        .font(.caption.weight(.bold))
+        .textCase(.uppercase)
+        .tracking(1)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 2)
+    }
+}
+
 struct DayRow: View {
     let block: Block
     let isCurrent: Bool
@@ -152,6 +246,11 @@ struct DayRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            Text(Routine.formatDuration(block.duration))
+                .font(.footnote.weight(.semibold))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 4)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 8)

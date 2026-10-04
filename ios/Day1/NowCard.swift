@@ -14,7 +14,7 @@ struct NowCard: View {
 
     var body: some View {
         TimelineView(.periodic(from: Date(timeIntervalSinceReferenceDate: 0), by: 1)) { context in
-            let now = context.date
+            let now = DebugClock.now(context.date)
             let remaining = isPreview ? block.duration : block.remaining(at: now)
             let progress = isPreview ? (now >= block.end ? 1.0 : 0.0) : block.progress(at: now)
             let urgent = !isPreview && !block.isSleep && remaining > 0 && remaining < 5 * 60
@@ -38,6 +38,17 @@ struct NowCard: View {
 
     private func fullBody(remaining: TimeInterval, progress: Double, urgent: Bool, pulseOn: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(block.isSleep ? "Sleep" : block.category.style.label)
+                Spacer(minLength: 8)
+                Text("\(block.startLabel)–\(block.endLabel)")
+                    .monospacedDigit()
+            }
+            .font(.caption2.weight(.bold))
+            .textCase(.uppercase)
+            .tracking(1)
+            .opacity(0.75)
+
             HStack(alignment: .firstTextBaseline) {
                 Text(block.displayTitle)
                     .font(.title2.weight(.bold))

@@ -14,7 +14,7 @@ ios/
 
 ## What is in the app
 
-- **Main screen** mirrors the web app: header, Now card with live countdown, "Next" line, top 3 for today (and tomorrow's during block 13), learning log during block 12 with the streak line, the full day list with done ticks and tap-to-preview, keep-awake toggle and reset.
+- **Main screen** mirrors the web app: header with program progress bar, Now card with live countdown, the day strip, "Next" line, top 3 for today (and tomorrow's during block 13), learning log during block 12 with the streak line, the full day list with done ticks and tap-to-preview, keep-awake toggle and reset.
 - **Storage** is `UserDefaults` in the shared App Group `group.com.sinkrundown.day1`, so the widget reads the same top 3 the app writes.
 - **Widgets** (one widget, four sizes):
   - Small home-screen: block number, title, live countdown, "until 12:30", filled with the category colour.
@@ -80,6 +80,10 @@ You do not need a paid developer account to put this on your own phone.
 - Provisioning profiles last **one year** instead of seven days, so no weekly re-sign.
 - You can distribute to yourself through **TestFlight** (builds last 90 days and update over the air) or as an **Ad Hoc** build, and you could publish on the App Store.
 - Wireless debugging, more devices and no three-app limit.
+
+## Previewing another time of day
+
+Debug builds read a `DAY1_FAKE_NOW` environment variable, in local time, so you can see any block without waiting for it. In Xcode: Product → Scheme → Edit Scheme → Run → Arguments → Environment Variables, add `DAY1_FAKE_NOW` = `2026-10-05T11:10:00`. Remove it to return to the real clock. Release builds ignore it, and the widget always uses the real clock.
 
 ## Editing the routine
 

@@ -140,7 +140,7 @@ public enum Routine {
         return .active
     }
 
-    /// Block 10 (bike / row) is active on odd program days: 1, 3, 5, ...
+    /// Block 10 (Ironman prep) is active on odd program days: 1, 3, 5, ...
     public static func isEverySecondDayBlockActive(on date: Date, calendar: Calendar = Routine.calendar) -> Bool {
         dayNumber(for: date, calendar: calendar) % 2 != 0
     }
@@ -261,6 +261,21 @@ public enum Routine {
         let m = (total % 3600) / 60
         let s = total % 60
         return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%02d:%02d", m, s)
+    }
+
+    /// "45m", "2h", "2h 45m"
+    public static func formatDuration(_ seconds: TimeInterval) -> String {
+        let mins = Int((seconds / 60).rounded())
+        let h = mins / 60
+        let m = mins % 60
+        if h == 0 { return "\(m)m" }
+        return m == 0 ? "\(h)h" : "\(h)h \(m)m"
+    }
+
+    /// Fraction 0...1 of the program completed by the end of `date`'s day, or nil outside the program.
+    public static func programFraction(_ date: Date, calendar: Calendar = Routine.calendar) -> Double? {
+        guard programStatus(for: date, calendar: calendar) == .active else { return nil }
+        return Double(dayNumber(for: date, calendar: calendar)) / Double(Schedule.programDays)
     }
 
     /// "Thu 1 Oct"

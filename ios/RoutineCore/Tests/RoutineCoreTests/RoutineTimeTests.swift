@@ -332,6 +332,21 @@ final class RoutineTimeTests: XCTestCase {
         XCTAssertEqual(Routine.formatRemaining(-5), "00:00")
     }
 
+    func testFormatDuration() {
+        XCTAssertEqual(Routine.formatDuration(15 * 60), "15m")
+        XCTAssertEqual(Routine.formatDuration(45 * 60), "45m")
+        XCTAssertEqual(Routine.formatDuration(2 * 3600), "2h")
+        XCTAssertEqual(Routine.formatDuration(2 * 3600 + 45 * 60), "2h 45m")
+    }
+
+    func testProgramFraction() {
+        let c = dublin
+        XCTAssertNil(Routine.programFraction(local(c, 2026, 10, 4), calendar: c))
+        XCTAssertEqual(Routine.programFraction(local(c, 2026, 10, 5), calendar: c)!, 0.01, accuracy: 0.0001)
+        XCTAssertEqual(Routine.programFraction(local(c, 2027, 1, 12), calendar: c)!, 1.0, accuracy: 0.0001)
+        XCTAssertNil(Routine.programFraction(local(c, 2027, 1, 13), calendar: c))
+    }
+
     // MARK: Learning streak
 
     private func streak(_ daysAgo: [Int]) -> Int {

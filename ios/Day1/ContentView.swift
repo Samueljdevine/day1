@@ -14,7 +14,7 @@ struct ContentView: View {
 
     var body: some View {
         TimelineView(.everyMinute) { context in
-            let now = context.date
+            let now = DebugClock.now(context.date)
             let blocks = Routine.blocks(for: now)
             let live = Routine.currentBlock(in: blocks, at: now)
             let next = Routine.nextBlock(in: blocks, at: now)
@@ -34,10 +34,20 @@ struct ContentView: View {
                                     .opacity(live.isSleep ? 0.4 : 1)
                                 NowCard(block: shown, isPreview: isPreview, compact: editing)
                                     .containerRelativeFrame(.vertical, alignment: .top) { height, _ in
-                                        editing ? 52 : max(240, height * 0.40)
+                                        editing ? 52 : max(250, height * 0.40)
                                     }
                                     .padding(.horizontal, 12)
-                                    .padding(.bottom, 8)
+                                DayStrip(
+                                    blocks: blocks,
+                                    live: live,
+                                    now: now,
+                                    previewed: model.preview,
+                                    onTap: { model.startPreview($0) }
+                                )
+                                .padding(.horizontal, 12)
+                                .padding(.top, 10)
+                                .padding(.bottom, 8)
+                                .opacity(live.isSleep ? 0.4 : 1)
                             }
                             .background(background(sleep: live.isSleep).ignoresSafeArea(edges: .top))
                         }
@@ -51,6 +61,8 @@ struct ContentView: View {
                 }
             }
             .background(background(sleep: live.isSleep))
+            // Sleep is always near-black, so text and fields must use dark styling even in light mode.
+            .preferredColorScheme(live.isSleep ? .dark : nil)
             .onAppear { model.ensureDate(now) }
             .onChange(of: now) { _, newValue in model.ensureDate(newValue) }
         }
@@ -65,15 +77,20 @@ struct ContentView: View {
     }
 
     private func header(now: Date) -> some View {
-        HStack {
-            Text(Routine.headerDate(now))
-            Spacer()
-            Text(Routine.programDay(now))
+        VStack(spacing: 6) {
+            HStack {
+                Text(Routine.headerDate(now))
+                Spacer()
+                Text(Routine.programDay(now))
+            }
+            .font(.title3.weight(.semibold))
+            if let fraction = Routine.programFraction(now) {
+                ProgramBar(fraction: fraction)
+            }
         }
-        .font(.title3.weight(.semibold))
         .padding(.horizontal, 16)
         .padding(.top, 8)
-        .padding(.bottom, 6)
+        .padding(.bottom, 8)
     }
 
     @ViewBuilder
@@ -118,6 +135,8 @@ struct ContentView: View {
         )
 
         Divider().padding(.top, 4)
+
+        DayHeader(done: blocks.filter { model.done.contains($0.number) }.count, total: blocks.count)
 
         ForEach(blocks) { block in
             DayRow(
