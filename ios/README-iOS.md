@@ -17,9 +17,9 @@ ios/
 - **Main screen** mirrors the web app: header with program progress bar, Now card with live countdown, the day strip, "Next" line, top 3 for today (and tomorrow's during block 13), learning log during block 12 with the streak line, the full day list with done ticks and tap-to-preview, keep-awake toggle and reset.
 - **Storage** is `UserDefaults` in the shared App Group `group.com.sinkrundown.day1`, so the widget reads the same top 3 the app writes.
 - **Widgets** (one widget, four sizes):
-  - Small home-screen: block number, title, live countdown, "until 12:30", filled with the category colour.
+  - Small home-screen: program progress bar, block number and title, live countdown, "until 12:30" and the day strip, filled with the category colour.
   - Medium home-screen: the same plus the next block and today's top 3 with ticks.
-  - Lock-screen rectangular: "06 · CrossFit", countdown, "until 12:30", next block.
+  - Lock-screen rectangular: "06 · CrossFit", countdown, "until 12:30" and a single-colour day strip.
   - Lock-screen inline: "06 · CrossFit · until 12:30".
   - The countdown is `Text(date, style: .timer)`, so it ticks without any reloads. The timeline has one entry per block boundary for the next 24 hours, so the widget flips at exactly 10:30:00. The timeline is rebuilt after local midnight so the new day's top 3 apply.
 - **Notifications** at each block start ("Block 07 · Calls + partners" / "until 15:15"), scheduled 24 hours ahead every time the app comes to the foreground. Permission is asked on first launch.
@@ -83,7 +83,9 @@ You do not need a paid developer account to put this on your own phone.
 
 ## Previewing another time of day
 
-Debug builds read a `DAY1_FAKE_NOW` environment variable, in local time, so you can see any block without waiting for it. In Xcode: Product → Scheme → Edit Scheme → Run → Arguments → Environment Variables, add `DAY1_FAKE_NOW` = `2026-10-05T11:10:00`. Remove it to return to the real clock. Release builds ignore it, and the widget always uses the real clock.
+Debug builds read a `DAY1_FAKE_NOW` environment variable, in local time, so you can see any block without waiting for it. In Xcode: Product → Scheme → Edit Scheme → Run → Arguments → Environment Variables, add `DAY1_FAKE_NOW` = `2026-10-05T11:10:00`. Remove it to return to the real clock. Release builds ignore it.
+
+The widget runs in its own process and cannot see that variable. For the simulator only, a debug build of the widget reads a local time from `/tmp/day1-fake-now.txt` on the Mac, for example `2026-10-05T11:10:00`. Delete the file to return to the real clock. On a real phone the widget always uses the real clock.
 
 ## Editing the routine
 
