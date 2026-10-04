@@ -48,8 +48,8 @@ export const BLOCKS: readonly BlockDef[] = [
     note: 'Most important Sink / farm task of the day. Offline, phone in another room.',
   },
   {
-    number: 3, start: '06:15', end: '07:30', title: 'Swim / cardio', category: 'train',
-    note: 'Swim 6:30 - 7:30. Includes travel and shower. Breakfast on the go.',
+    number: 3, start: '06:15', end: '07:30', title: 'Lazy Tiger test cardio', category: 'train',
+    note: 'Lazy Tiger test cardio 6:30 - 7:30. Includes travel and shower. Breakfast on the go.',
   },
   {
     number: 4, start: '07:30', end: '10:00', title: 'Deep work 2 - Build the farm plan', category: 'deep',
@@ -76,8 +76,8 @@ export const BLOCKS: readonly BlockDef[] = [
     note: 'Management model, brand, systems and SOPs that let Sink run the farm and padel.',
   },
   {
-    number: 10, start: '17:15', end: '18:30', title: 'Bike / row', category: 'train',
-    note: 'Ride 17:30 - 18:30, easy zone 2, includes shower.',
+    number: 10, start: '17:15', end: '18:30', title: 'Ironman prep', category: 'train',
+    note: 'Ironman prep 17:30 - 18:30, includes shower.',
   },
   {
     number: 11, start: '18:30', end: '19:15', title: 'Dinner', category: 'fuel',

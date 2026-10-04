@@ -96,7 +96,7 @@ export function getProgramStatus(date: Date): ProgramStatus {
   return 'active';
 }
 
-/** Block 10 (bike / row) is active on odd program days: 1, 3, 5, ... */
+/** Block 10 (Ironman prep) is active on odd program days: 1, 3, 5, ... */
 export function isEverySecondDayBlockActive(date: Date): boolean {
   return getDayNumber(date) % 2 !== 0;
 }

@@ -10,7 +10,7 @@ The `ios/` folder holds the Phase 2 native app: a SwiftUI app with home-screen a
 
 ## Edit the routine
 
-All blocks, times, titles, notes and category colours live in [`src/schedule.ts`](src/schedule.ts). Change them there; nothing else needs to be touched. Block 10 (bike / row) runs on odd program days only; on even days block 9 extends to 18:30.
+All blocks, times, titles, notes and category colours live in [`src/schedule.ts`](src/schedule.ts). Change them there; nothing else needs to be touched. Block 10 (Ironman prep) runs on odd program days only; on even days block 9 extends to 18:30.
 
 ## Run locally
 

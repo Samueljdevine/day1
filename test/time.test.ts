@@ -135,7 +135,7 @@ inZone('Europe/Dublin', () => {
   });
 
   describe('odd and even days', () => {
-    it('day 1 (odd) has all 14 blocks including bike / row', () => {
+    it('day 1 (odd) has all 14 blocks including Ironman prep', () => {
       expect(numbers(local(2026, 10, 5))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
       const b9 = getBlocksForDate(local(2026, 10, 5)).find((b) => b.number === 9)!;
       expect(b9.title).toBe('Deep work 3 - Sink as the operator');
