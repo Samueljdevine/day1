@@ -67,6 +67,10 @@ struct ContentView: View {
             .onAppear { model.ensureDate(now) }
             .onChange(of: now) { _, newValue in model.ensureDate(newValue) }
         }
+        // The widgets' plan button deep-links here with day1://plan.
+        .onOpenURL { url in
+            if url.scheme == "day1", url.host == "plan" { showPlan = true }
+        }
         .fullScreenCover(isPresented: $showPlan) {
             DayPlanView(done: model.done)
         }

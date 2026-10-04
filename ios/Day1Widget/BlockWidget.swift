@@ -136,6 +136,23 @@ struct BlockProvider: TimelineProvider {
     }
 }
 
+/// Deep link the app handles in `onOpenURL` to open the full-day plan.
+let planURL = URL(string: "day1://plan")!
+
+/// The same icon as the plan button in the app's header.
+struct PlanGlyph: View {
+    let fg: Color
+
+    var body: some View {
+        Image(systemName: "calendar.day.timeline.left")
+            .font(.caption.weight(.bold))
+            .foregroundStyle(fg)
+            .frame(width: 28, height: 28)
+            .background(fg.opacity(0.16), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .accessibilityLabel("Show today's schedule")
+    }
+}
+
 struct BlockWidgetEntryView: View {
     @Environment(\.widgetFamily) private var family
     @Environment(\.colorScheme) private var scheme
@@ -176,7 +193,7 @@ struct BlockWidgetEntryView: View {
             VStack(spacing: 8) {
                 programBar
                 HStack(alignment: .top, spacing: 14) {
-                    mainColumn
+                    mainColumn(planHint: false)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                     Divider()
                         .overlay(block.text(for: scheme).opacity(0.3))
@@ -191,10 +208,12 @@ struct BlockWidgetEntryView: View {
         default:
             VStack(spacing: 7) {
                 programBar
-                mainColumn
+                mainColumn(planHint: true)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 strip
             }
+                // A small widget has one tap target, so the whole widget opens the plan.
+                .widgetURL(planURL)
                 .foregroundStyle(block.text(for: scheme))
                 .containerBackground(block.fill(for: scheme), for: .widget)
         }
@@ -212,7 +231,7 @@ struct BlockWidgetEntryView: View {
             .frame(height: 9)
     }
 
-    private var mainColumn: some View {
+    private func mainColumn(planHint: Bool) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(block.displayTitle)
                 .font(.headline)
@@ -224,10 +243,18 @@ struct BlockWidgetEntryView: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-            Text(untilText)
-                .font(.subheadline.weight(.semibold))
-                .monospacedDigit()
-                .opacity(0.9)
+            HStack(alignment: .bottom, spacing: 4) {
+                Text(untilText)
+                    .font(.subheadline.weight(.semibold))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .opacity(0.9)
+                if planHint {
+                    Spacer(minLength: 0)
+                    PlanGlyph(fg: block.text(for: scheme))
+                }
+            }
         }
     }
 
@@ -240,17 +267,26 @@ struct BlockWidgetEntryView: View {
                 .minimumScaleFactor(0.8)
                 .opacity(0.85)
             Spacer(minLength: 0)
-            ForEach(0..<3, id: \.self) { i in
-                let item = i < entry.top3.count ? entry.top3[i] : RoutineStore.Top3Item()
-                HStack(spacing: 5) {
-                    Image(systemName: item.done ? "checkmark.square.fill" : "square")
-                        .font(.caption)
-                    Text(item.text.isEmpty ? "–" : item.text)
-                        .font(.caption)
-                        .lineLimit(1)
-                        .strikethrough(item.done)
+            HStack(alignment: .bottom, spacing: 6) {
+                VStack(alignment: .leading, spacing: 3) {
+                    ForEach(0..<3, id: \.self) { i in
+                        let item = i < entry.top3.count ? entry.top3[i] : RoutineStore.Top3Item()
+                        HStack(spacing: 5) {
+                            Image(systemName: item.done ? "checkmark.square.fill" : "square")
+                                .font(.caption)
+                            Text(item.text.isEmpty ? "–" : item.text)
+                                .font(.caption)
+                                .lineLimit(1)
+                                .strikethrough(item.done)
+                        }
+                        .opacity(item.done ? 0.6 : 1)
+                    }
                 }
-                .opacity(item.done ? 0.6 : 1)
+                Spacer(minLength: 0)
+                // Its own tap target: opens the full-day plan. The rest of the widget opens the main screen.
+                Link(destination: planURL) {
+                    PlanGlyph(fg: block.text(for: scheme))
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ ios/
   - Small home-screen: program progress bar, block number and title, live countdown, "until 12:30" and the day strip, filled with the category colour.
   - Medium home-screen: the same plus the next block and today's top 3 with ticks.
   - Lock-screen rectangular: "06 · CrossFit", countdown, "until 12:30" and a single-colour day strip.
+  - Plan button: the medium widget has its own button that opens the app on Today's plan; tapping anywhere else opens the main screen. A small widget has a single tap target, so tapping it anywhere opens the plan. Lock-screen widgets open the main screen.
   - Lock-screen inline: "06 · CrossFit · until 12:30".
   - The countdown is `Text(date, style: .timer)`, so it ticks without any reloads. The timeline has one entry per block boundary for the next 24 hours, so the widget flips at exactly 10:30:00. The timeline is rebuilt after local midnight so the new day's top 3 apply.
 - **Notifications** at each block start ("Block 07 · Calls + partners" / "until 15:15"), scheduled 24 hours ahead every time the app comes to the foreground. Permission is asked on first launch.
