@@ -12,7 +12,6 @@ import {
   getProgramStatus,
   toDateKey,
 } from '../src/time';
-import { EXTENDED_TITLE } from '../src/schedule';
 
 // Minimal Node global so the build type-check passes without @types/node.
 declare const process: { env: Record<string, string | undefined> };
@@ -37,6 +36,7 @@ const local = (y: number, m: number, d: number, hh = 0, mm = 0, ss = 0): Date =>
   new Date(y, m - 1, d, hh, mm, ss, 0);
 
 const numbers = (date: Date): number[] => getBlocksForDate(date).map((b) => b.number);
+const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 // ---------------------------------------------------------------------------
 
@@ -58,10 +58,10 @@ inZone('Europe/Dublin', () => {
     expect(getDayNumber(local(2027, 1, 12, 23, 59, 59))).toBe(100);
   });
 
-  it('keeps the odd/even rule intact around the clock change', () => {
-    expect(numbers(local(2026, 10, 25, 12))).toContain(10); // day 21, odd
-    expect(numbers(local(2026, 10, 26, 12))).not.toContain(10); // day 22, even
-    expect(numbers(local(2026, 10, 27, 12))).toContain(10); // day 23, odd
+  it('has the same 14 blocks on both sides of the clock change', () => {
+    expect(numbers(local(2026, 10, 24, 12))).toEqual(ALL);
+    expect(numbers(local(2026, 10, 25, 12))).toEqual(ALL);
+    expect(numbers(local(2026, 10, 26, 12))).toEqual(ALL);
   });
 
   it('blocks on the clock-change day still start at local wall-clock time', () => {
@@ -92,10 +92,10 @@ inZone('America/Toronto', () => {
     expect(getDayNumber(local(2027, 1, 12, 12))).toBe(100);
   });
 
-  it('keeps the odd/even rule intact around the clock change', () => {
-    expect(numbers(local(2026, 10, 31, 12))).toContain(10); // day 27
-    expect(numbers(local(2026, 11, 1, 12))).not.toContain(10); // day 28
-    expect(numbers(local(2026, 11, 2, 12))).toContain(10); // day 29
+  it('has the same 14 blocks on both sides of the clock change', () => {
+    expect(numbers(local(2026, 10, 31, 12))).toEqual(ALL);
+    expect(numbers(local(2026, 11, 1, 12))).toEqual(ALL);
+    expect(numbers(local(2026, 11, 2, 12))).toEqual(ALL);
   });
 });
 
@@ -134,45 +134,32 @@ inZone('Europe/Dublin', () => {
     });
   });
 
-  describe('odd and even days', () => {
-    it('day 1 (odd) has all 14 blocks including Ironman prep', () => {
-      expect(numbers(local(2026, 10, 5))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
-      const b9 = getBlocksForDate(local(2026, 10, 5)).find((b) => b.number === 9)!;
-      expect(b9.title).toBe('Deep work 3 - Sink as the operator');
-      expect(b9.endLabel).toBe('17:15');
+  describe('every day is identical', () => {
+    it('has all 14 blocks on odd and even program days', () => {
+      expect(numbers(local(2026, 10, 5))).toEqual(ALL); // day 1
+      expect(numbers(local(2026, 10, 6))).toEqual(ALL); // day 2
+      expect(numbers(local(2027, 1, 12))).toEqual(ALL); // day 100
+      expect(numbers(local(2026, 10, 4))).toEqual(ALL); // before the program
     });
 
-    it('day 2 (even) drops block 10 and extends block 9 to 18:30', () => {
-      const blocks = getBlocksForDate(local(2026, 10, 6));
-      expect(blocks.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]);
-      const b9 = blocks.find((b) => b.number === 9)!;
-      expect(b9.title).toBe(EXTENDED_TITLE);
-      expect(b9.startLabel).toBe('15:30');
-      expect(b9.endLabel).toBe('18:30');
-      expect(b9.end.getHours()).toBe(18);
-      expect(b9.end.getMinutes()).toBe(30);
-      const b11 = blocks.find((b) => b.number === 11)!;
-      expect(b11.startLabel).toBe('18:30');
+    it('block 9 always ends at 17:15 and block 10 is Ironman prep until 18:30', () => {
+      for (const day of [5, 6]) {
+        const blocks = getBlocksForDate(local(2026, 10, day));
+        const b9 = blocks.find((b) => b.number === 9)!;
+        expect(b9.title).toBe('Deep work 3 - Sink as the operator');
+        expect(b9.endLabel).toBe('17:15');
+        const b10 = blocks.find((b) => b.number === 10)!;
+        expect(b10.title).toBe('Ironman prep');
+        expect(b10.startLabel).toBe('17:15');
+        expect(b10.endLabel).toBe('18:30');
+      }
     });
 
-    it('counts by program day, not by odd calendar date', () => {
-      expect(numbers(local(2026, 10, 5))).toContain(10); // day 1
-      expect(numbers(local(2026, 10, 6))).not.toContain(10); // day 2
-      expect(numbers(local(2026, 11, 1))).not.toContain(10); // 1 Nov is day 28
-      expect(numbers(local(2026, 11, 2))).toContain(10); // 2 Nov is day 29
-      expect(numbers(local(2027, 1, 12))).not.toContain(10); // day 100
-    });
-
-    it('block 9 is the current block at 18:00 on an even day', () => {
-      const now = local(2026, 10, 6, 18, 0, 0);
-      const cur = getCurrentBlock(getBlocksForDate(now), now);
-      expect(cur.number).toBe(9);
-      expect(cur.title).toBe(EXTENDED_TITLE);
-    });
-
-    it('block 10 is the current block at 18:00 on an odd day', () => {
-      const now = local(2026, 10, 7, 18, 0, 0);
-      expect(getCurrentBlock(getBlocksForDate(now), now).number).toBe(10);
+    it('Ironman prep is the current block at 18:00 on consecutive days', () => {
+      for (const day of [5, 6, 7]) {
+        const now = local(2026, 10, day, 18, 0, 0);
+        expect(getCurrentBlock(getBlocksForDate(now), now).number).toBe(10);
+      }
     });
   });
 

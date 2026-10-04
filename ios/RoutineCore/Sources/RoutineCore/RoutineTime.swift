@@ -140,42 +140,23 @@ public enum Routine {
         return .active
     }
 
-    /// Block 10 (Ironman prep) is active on odd program days: 1, 3, 5, ...
-    public static func isEverySecondDayBlockActive(on date: Date, calendar: Calendar = Routine.calendar) -> Bool {
-        dayNumber(for: date, calendar: calendar) % 2 != 0
-    }
-
     // MARK: Blocks
 
-    /// All blocks for the local calendar date of `date`, in order, with real start/end instants.
+    /// All blocks for the local calendar date of `date`, in order, with real start/end instants. Every day is identical.
     public static func blocks(for date: Date, calendar: Calendar = Routine.calendar) -> [Block] {
-        let includeAlternate = isEverySecondDayBlockActive(on: date, calendar: calendar)
-        let alternateDef = Schedule.blocks.first { $0.number == Schedule.everySecondDayBlock }
-        var result: [Block] = []
-
-        for def in Schedule.blocks {
-            if def.number == Schedule.everySecondDayBlock && !includeAlternate { continue }
-
-            var title = def.title
-            var end = def.end
-            if def.number == Schedule.extendedBlock && !includeAlternate, let alt = alternateDef {
-                title = Schedule.extendedTitle
-                end = alt.end
-            }
-
-            result.append(Block(
+        Schedule.blocks.map { def in
+            Block(
                 number: def.number,
-                title: title,
+                title: def.title,
                 category: def.category,
                 note: def.note,
                 start: atTime(date, def.start, calendar: calendar),
-                end: atTime(date, end, calendar: calendar),
+                end: atTime(date, def.end, calendar: calendar),
                 startLabel: def.start,
-                endLabel: end,
+                endLabel: def.end,
                 isSleep: false
-            ))
+            )
         }
-        return result
     }
 
     /// The Sleep pseudo-block that contains (or follows) `now`.

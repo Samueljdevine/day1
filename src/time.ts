@@ -4,9 +4,6 @@
  */
 import {
   BLOCKS,
-  EVERY_SECOND_DAY_BLOCK,
-  EXTENDED_BLOCK,
-  EXTENDED_TITLE,
   LIGHTS_OUT,
   PROGRAM_DAYS,
   PROGRAM_START,
@@ -96,40 +93,19 @@ export function getProgramStatus(date: Date): ProgramStatus {
   return 'active';
 }
 
-/** Block 10 (Ironman prep) is active on odd program days: 1, 3, 5, ... */
-export function isEverySecondDayBlockActive(date: Date): boolean {
-  return getDayNumber(date) % 2 !== 0;
-}
-
-/** All blocks for the local calendar date of `date`, in order, with real start/end instants. */
+/** All blocks for the local calendar date of `date`, in order, with real start/end instants. Every day is identical. */
 export function getBlocksForDate(date: Date): Block[] {
-  const includeAlternate = isEverySecondDayBlockActive(date);
-  const alternateDef = BLOCKS.find((b) => b.number === EVERY_SECOND_DAY_BLOCK);
-  const blocks: Block[] = [];
-
-  for (const def of BLOCKS) {
-    if (def.number === EVERY_SECOND_DAY_BLOCK && !includeAlternate) continue;
-
-    let title = def.title;
-    let end = def.end;
-    if (def.number === EXTENDED_BLOCK && !includeAlternate && alternateDef) {
-      title = EXTENDED_TITLE;
-      end = alternateDef.end;
-    }
-
-    blocks.push({
-      number: def.number,
-      title,
-      category: def.category,
-      note: def.note,
-      start: atTime(date, def.start),
-      end: atTime(date, end),
-      startLabel: def.start,
-      endLabel: end,
-      isSleep: false,
-    });
-  }
-  return blocks;
+  return BLOCKS.map((def) => ({
+    number: def.number,
+    title: def.title,
+    category: def.category,
+    note: def.note,
+    start: atTime(date, def.start),
+    end: atTime(date, def.end),
+    startLabel: def.start,
+    endLabel: def.end,
+    isSleep: false,
+  }));
 }
 
 /** The Sleep pseudo-block that contains (or follows) `now`. */

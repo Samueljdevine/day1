@@ -49,11 +49,11 @@ final class RoutineTimeTests: XCTestCase {
         XCTAssertEqual(Routine.dayNumber(for: local(c, 2027, 1, 13), calendar: c), 101)
     }
 
-    func testDublinOddEvenRuleAroundClockChange() {
+    func testDublinSameBlocksAroundClockChange() {
         let c = cal("Europe/Dublin")
-        XCTAssertTrue(numbers(c, local(c, 2026, 10, 25, 12)).contains(10)) // day 21, odd
-        XCTAssertFalse(numbers(c, local(c, 2026, 10, 26, 12)).contains(10)) // day 22, even
-        XCTAssertTrue(numbers(c, local(c, 2026, 10, 27, 12)).contains(10)) // day 23, odd
+        for day in [24, 25, 26] {
+            XCTAssertEqual(numbers(c, local(c, 2026, 10, day, 12)), Array(1...14))
+        }
     }
 
     func testDublinBlocksOnClockChangeDayUseWallClock() {
@@ -87,11 +87,11 @@ final class RoutineTimeTests: XCTestCase {
         XCTAssertEqual(Routine.dayNumber(for: local(c, 2027, 1, 12, 12), calendar: c), 100)
     }
 
-    func testTorontoOddEvenRuleAroundClockChange() {
+    func testTorontoSameBlocksAroundClockChange() {
         let c = cal("America/Toronto")
-        XCTAssertTrue(numbers(c, local(c, 2026, 10, 31, 12)).contains(10)) // day 27
-        XCTAssertFalse(numbers(c, local(c, 2026, 11, 1, 12)).contains(10)) // day 28
-        XCTAssertTrue(numbers(c, local(c, 2026, 11, 2, 12)).contains(10)) // day 29
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 31, 12)), Array(1...14))
+        XCTAssertEqual(numbers(c, local(c, 2026, 11, 1, 12)), Array(1...14))
+        XCTAssertEqual(numbers(c, local(c, 2026, 11, 2, 12)), Array(1...14))
     }
 
     // MARK: Asia/Bangkok, no clock change
@@ -150,47 +150,37 @@ final class RoutineTimeTests: XCTestCase {
         XCTAssertFalse(Routine.blocks(for: local(c, 2027, 1, 13), calendar: c).isEmpty)
     }
 
-    // MARK: Odd and even days
+    // MARK: Every day is identical
 
-    func testOddDayHasAllFourteenBlocks() {
+    func testEveryDayHasAllFourteenBlocks() {
         let c = dublin
-        XCTAssertEqual(numbers(c, local(c, 2026, 10, 5)), Array(1...14))
-        let b9 = Routine.blocks(for: local(c, 2026, 10, 5), calendar: c).first { $0.number == 9 }!
-        XCTAssertEqual(b9.title, "Deep work 3 - Sink as the operator")
-        XCTAssertEqual(b9.endLabel, "17:15")
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 5)), Array(1...14)) // day 1
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 6)), Array(1...14)) // day 2
+        XCTAssertEqual(numbers(c, local(c, 2027, 1, 12)), Array(1...14)) // day 100
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 4)), Array(1...14)) // before the program
     }
 
-    func testEvenDayDropsBlockTenAndExtendsBlockNine() {
+    func testBlockNineAndIronmanPrepAreTheSameEveryDay() {
         let c = dublin
-        let blocks = Routine.blocks(for: local(c, 2026, 10, 6), calendar: c)
-        XCTAssertEqual(blocks.map(\.number), [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14])
-        let b9 = blocks.first { $0.number == 9 }!
-        XCTAssertEqual(b9.title, Schedule.extendedTitle)
-        XCTAssertEqual(b9.startLabel, "15:30")
-        XCTAssertEqual(b9.endLabel, "18:30")
-        XCTAssertEqual(c.component(.hour, from: b9.end), 18)
-        XCTAssertEqual(c.component(.minute, from: b9.end), 30)
-        XCTAssertEqual(blocks.first { $0.number == 11 }!.startLabel, "18:30")
+        for day in [5, 6] {
+            let blocks = Routine.blocks(for: local(c, 2026, 10, day), calendar: c)
+            let b9 = blocks.first { $0.number == 9 }!
+            XCTAssertEqual(b9.title, "Deep work 3 - Sink as the operator")
+            XCTAssertEqual(b9.endLabel, "17:15")
+            let b10 = blocks.first { $0.number == 10 }!
+            XCTAssertEqual(b10.title, "Ironman prep")
+            XCTAssertEqual(b10.startLabel, "17:15")
+            XCTAssertEqual(b10.endLabel, "18:30")
+        }
     }
 
-    func testCountsByProgramDayNotCalendarDate() {
-        let c = dublin
-        XCTAssertTrue(numbers(c, local(c, 2026, 10, 5)).contains(10)) // day 1
-        XCTAssertFalse(numbers(c, local(c, 2026, 10, 6)).contains(10)) // day 2
-        XCTAssertFalse(numbers(c, local(c, 2026, 11, 1)).contains(10)) // day 28
-        XCTAssertTrue(numbers(c, local(c, 2026, 11, 2)).contains(10)) // day 29
-        XCTAssertFalse(numbers(c, local(c, 2027, 1, 12)).contains(10)) // day 100
-    }
 
-    func testCurrentBlockAtSixPmOnEvenAndOddDays() {
+    func testIronmanPrepIsCurrentAtSixPmOnConsecutiveDays() {
         let c = dublin
-        let even = local(c, 2026, 10, 6, 18, 0, 0)
-        let cur = Routine.currentBlock(in: Routine.blocks(for: even, calendar: c), at: even, calendar: c)
-        XCTAssertEqual(cur.number, 9)
-        XCTAssertEqual(cur.title, Schedule.extendedTitle)
-
-        let odd = local(c, 2026, 10, 7, 18, 0, 0)
-        XCTAssertEqual(Routine.currentBlock(in: Routine.blocks(for: odd, calendar: c), at: odd, calendar: c).number, 10)
+        for day in [5, 6, 7] {
+            let now = local(c, 2026, 10, day, 18, 0, 0)
+            XCTAssertEqual(Routine.currentBlock(in: Routine.blocks(for: now, calendar: c), at: now, calendar: c).number, 10)
+        }
     }
 
     // MARK: Sleep state
@@ -416,10 +406,10 @@ final class RoutineTimeTests: XCTestCase {
         let upcoming = Routine.upcomingBlocks(from: now, hours: 24, calendar: c)
         XCTAssertEqual(upcoming.first?.number, 14)
         XCTAssertEqual(upcoming.first?.start, local(c, 2026, 10, 5, 21, 0, 0))
-        // Block 14 tonight, then tomorrow (day 2, even, no block 10) blocks 1-9 and 11-13
-        // start by 20:00. Tomorrow's block 14 at 21:00 is outside the 24 h window.
-        XCTAssertEqual(upcoming.count, 13)
+        // Block 14 tonight, then tomorrow's blocks 1-13 start by 20:00.
+        // Tomorrow's block 14 at 21:00 is outside the 24 h window.
+        XCTAssertEqual(upcoming.count, 14)
         XCTAssertEqual(upcoming.last?.number, 13)
-        XCTAssertFalse(upcoming.contains { $0.number == 10 && Routine.dayNumber(for: $0.start, calendar: c) == 2 })
+        XCTAssertTrue(upcoming.contains { $0.number == 10 })
     }
 }

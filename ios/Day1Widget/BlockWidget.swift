@@ -22,8 +22,7 @@ struct BlockProvider: TimelineProvider {
 
     /// One entry now plus one at every block boundary in the next 24 hours, so
     /// the widget flips at exactly 10:30:00 with no polling. The whole timeline
-    /// is rebuilt after local midnight so the odd/even day rule and the new
-    /// day's top 3 apply.
+    /// is rebuilt after local midnight so the new day's top 3 apply.
     func getTimeline(in context: Context, completion: @escaping (Timeline<BlockEntry>) -> Void) {
         let now = Date()
         var entries = [entry(at: now)]

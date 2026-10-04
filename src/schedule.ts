@@ -27,12 +27,6 @@ export const WAKE = '05:00';
 /** Lights out. Sleep state starts here. */
 export const LIGHTS_OUT = '22:00';
 
-/** Block that only happens on odd program days (day 1, 3, 5, ...). */
-export const EVERY_SECOND_DAY_BLOCK = 10;
-/** Block that extends to fill the gap on even days. */
-export const EXTENDED_BLOCK = 9;
-export const EXTENDED_TITLE = 'Deep work 3 - Sink as the operator (extended)';
-
 /** Block during which "Tomorrow's top 3" inputs are shown. */
 export const TOMORROW_TOP3_BLOCK = 13;
 /** Block during which the learning log input is shown. */

@@ -10,7 +10,7 @@ ios/
   RoutineCore/              Local Swift package: schedule, time logic, storage, tests
 ```
 
-`RoutineCore` is a line-for-line port of `src/schedule.ts`, `src/time.ts` and `src/storage.ts` from the web app, with the same XCTest cases as the Vitest suite (day numbers across the Dublin and Toronto clock changes, odd/even days, sleep state, exact boundaries, countdown formatting, learning streak) plus widget-timeline and notification-window tests.
+`RoutineCore` is a line-for-line port of `src/schedule.ts`, `src/time.ts` and `src/storage.ts` from the web app, with the same XCTest cases as the Vitest suite (day numbers across the Dublin and Toronto clock changes, the daily block list, sleep state, exact boundaries, countdown formatting, learning streak) plus widget-timeline and notification-window tests.
 
 ## What is in the app
 
@@ -21,7 +21,7 @@ ios/
   - Medium home-screen: the same plus the next block and today's top 3 with ticks.
   - Lock-screen rectangular: "06 · CrossFit", countdown, "until 12:30", next block.
   - Lock-screen inline: "06 · CrossFit · until 12:30".
-  - The countdown is `Text(date, style: .timer)`, so it ticks without any reloads. The timeline has one entry per block boundary for the next 24 hours, so the widget flips at exactly 10:30:00. The timeline is rebuilt after local midnight so the odd/even day rule and the new day's top 3 apply.
+  - The countdown is `Text(date, style: .timer)`, so it ticks without any reloads. The timeline has one entry per block boundary for the next 24 hours, so the widget flips at exactly 10:30:00. The timeline is rebuilt after local midnight so the new day's top 3 apply.
 - **Notifications** at each block start ("Block 07 · Calls + partners" / "until 15:15"), scheduled 24 hours ahead every time the app comes to the foreground. Permission is asked on first launch.
 
 ## Run the tests
@@ -91,4 +91,4 @@ Change the blocks in `RoutineCore/Sources/RoutineCore/Schedule.swift` (and keep 
 
 ## How the widget stays exact
 
-WidgetKit does not poll. `BlockProvider.getTimeline` builds one entry for right now and one for each block start or end in the next 24 hours, so iOS swaps to the next entry at precisely 10:30:00. Inside each entry the remaining time is a system timer text bound to the block's end date, which iOS updates every second on its own. The reload policy is `.after(local midnight)` so tomorrow's odd/even schedule and top 3 are picked up as the date changes; the app also asks for a reload whenever it comes to the foreground or you edit the top 3.
+WidgetKit does not poll. `BlockProvider.getTimeline` builds one entry for right now and one for each block start or end in the next 24 hours, so iOS swaps to the next entry at precisely 10:30:00. Inside each entry the remaining time is a system timer text bound to the block's end date, which iOS updates every second on its own. The reload policy is `.after(local midnight)` so tomorrow's top 3 are picked up as the date changes; the app also asks for a reload whenever it comes to the foreground or you edit the top 3.

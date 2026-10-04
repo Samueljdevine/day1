@@ -39,12 +39,6 @@ public enum Schedule {
     /// Lights out. Sleep state starts here.
     public static let lightsOut = "22:00"
 
-    /// Block that only happens on odd program days (day 1, 3, 5, ...).
-    public static let everySecondDayBlock = 10
-    /// Block that extends to fill the gap on even days.
-    public static let extendedBlock = 9
-    public static let extendedTitle = "Deep work 3 - Sink as the operator (extended)"
-
     /// Block during which "Tomorrow's top 3" inputs are shown.
     public static let tomorrowTop3Block = 13
     /// Block during which the learning log input is shown.

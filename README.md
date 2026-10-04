@@ -10,7 +10,7 @@ The `ios/` folder holds the Phase 2 native app: a SwiftUI app with home-screen a
 
 ## Edit the routine
 
-All blocks, times, titles, notes and category colours live in [`src/schedule.ts`](src/schedule.ts). Change them there; nothing else needs to be touched. Block 10 (Ironman prep) runs on odd program days only; on even days block 9 extends to 18:30.
+All blocks, times, titles, notes and category colours live in [`src/schedule.ts`](src/schedule.ts). Change them there; nothing else needs to be touched. Every day is identical.
 
 ## Run locally
 
@@ -29,7 +29,7 @@ Open the URL Vite prints (normally `http://localhost:5173`).
 npm test
 ```
 
-Runs the Vitest suite for `src/time.ts`: day numbers across the 25 October (Dublin) and 1 November (Toronto) clock changes, odd/even day block lists, the sleep state, exact block boundaries, countdown formatting and the learning streak.
+Runs the Vitest suite for `src/time.ts`: day numbers across the 25 October (Dublin) and 1 November (Toronto) clock changes, the daily block list, the sleep state, exact block boundaries, countdown formatting and the learning streak.
 
 ## Build
 
