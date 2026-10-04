@@ -18,9 +18,9 @@ export interface BlockDef {
 }
 
 /** First day of the program (local calendar date). Day 1. */
-export const PROGRAM_START = { year: 2026, month: 10, day: 1 };
-/** Number of days in the program. Last day is 31 December 2026. */
-export const PROGRAM_DAYS = 92;
+export const PROGRAM_START = { year: 2026, month: 10, day: 5 };
+/** Number of consecutive days in the program. Last day is Tuesday 12 January 2027. */
+export const PROGRAM_DAYS = 100;
 
 /** Wake time. Sleep state ends here. */
 export const WAKE = '05:00';

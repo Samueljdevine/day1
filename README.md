@@ -2,7 +2,7 @@
 
 A single-user daily routine tracker for your phone. It shows which block of the routine you should be in right now, how much time is left, and what comes next. No backend, no accounts, no analytics. Everything is stored in `localStorage` on the device and the app works fully offline once installed.
 
-The program runs from Thursday 1 October 2026 to Thursday 31 December 2026 (92 days). All times follow the phone's local clock, so the routine follows you between Ireland, Toronto and Bangkok without any settings.
+The program runs for 100 consecutive days, from Monday 5 October 2026 to Tuesday 12 January 2027. All times follow the phone's local clock, so the routine follows you between Ireland, Toronto and Bangkok without any settings.
 
 ## Native iOS app and widgets
 

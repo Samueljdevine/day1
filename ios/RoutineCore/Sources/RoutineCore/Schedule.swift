@@ -30,9 +30,9 @@ public struct BlockDef: Sendable {
 
 public enum Schedule {
     /// First day of the program (local calendar date). Day 1.
-    public static let programStart = DateComponents(year: 2026, month: 10, day: 1)
-    /// Number of days in the program. Last day is 31 December 2026.
-    public static let programDays = 92
+    public static let programStart = DateComponents(year: 2026, month: 10, day: 5)
+    /// Number of consecutive days in the program. Last day is Tuesday 12 January 2027.
+    public static let programDays = 100
 
     /// Wake time. Sleep state ends here.
     public static let wake = "05:00"

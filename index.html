@@ -19,8 +19,13 @@
         <span id="hdr-date">—</span>
         <span id="hdr-day">—</span>
       </header>
+      <div id="program-bar" class="program-bar" hidden><div id="program-fill" class="program-fill"></div></div>
 
       <section id="now" class="now" data-category="rest" aria-live="off">
+        <div class="now-meta">
+          <span id="now-cat"></span>
+          <span id="now-range"></span>
+        </div>
         <div class="now-top">
           <span id="now-title">—</span>
           <span id="now-tag" class="now-tag" hidden>Preview</span>
@@ -30,6 +35,8 @@
         <p id="now-note" class="note"></p>
         <div class="bar"><div id="now-bar" class="bar-fill"></div></div>
       </section>
+
+      <div id="strip" class="strip" aria-label="Today at a glance"></div>
 
       <div id="next" class="next">&nbsp;</div>
 
@@ -51,13 +58,14 @@
       </section>
 
       <section class="day">
+        <div class="day-head"><span>Today</span><span id="day-count"></span></div>
         <ol id="day-list"></ol>
       </section>
 
       <footer class="footer">
-        <label id="wake-wrap" hidden><input type="checkbox" id="wake-toggle" /> Keep screen awake</label>
-        <button id="alerts-btn" type="button">Enable block alerts</button>
-        <a href="#" id="reset-link">Reset today</a>
+        <button id="wake-btn" class="pill" type="button" aria-pressed="false" aria-label="Keep screen awake" hidden>Keep awake</button>
+        <button id="alerts-btn" class="pill" type="button" aria-pressed="false">Block alerts</button>
+        <button id="reset-link" class="pill pill-quiet" type="button">Reset today</button>
       </footer>
     </main>
     <script type="module" src="/src/main.ts"></script>

@@ -47,20 +47,21 @@ inZone('Europe/Dublin', () => {
   });
 
   it('counts day numbers by calendar date across the clock change', () => {
-    expect(getDayNumber(local(2026, 10, 1))).toBe(1);
-    expect(getDayNumber(local(2026, 10, 24, 23, 59, 59))).toBe(24);
-    expect(getDayNumber(local(2026, 10, 25, 0, 30))).toBe(25);
-    expect(getDayNumber(local(2026, 10, 25, 12))).toBe(25);
-    expect(getDayNumber(local(2026, 10, 25, 23, 59, 59))).toBe(25);
-    expect(getDayNumber(local(2026, 10, 26, 0, 0, 0))).toBe(26);
-    expect(getDayNumber(local(2026, 10, 26, 12))).toBe(26);
-    expect(getDayNumber(local(2026, 12, 31))).toBe(92);
+    expect(getDayNumber(local(2026, 10, 5))).toBe(1);
+    expect(getDayNumber(local(2026, 10, 24, 23, 59, 59))).toBe(20);
+    expect(getDayNumber(local(2026, 10, 25, 0, 30))).toBe(21);
+    expect(getDayNumber(local(2026, 10, 25, 12))).toBe(21);
+    expect(getDayNumber(local(2026, 10, 25, 23, 59, 59))).toBe(21);
+    expect(getDayNumber(local(2026, 10, 26, 0, 0, 0))).toBe(22);
+    expect(getDayNumber(local(2026, 10, 26, 12))).toBe(22);
+    expect(getDayNumber(local(2026, 12, 31))).toBe(88);
+    expect(getDayNumber(local(2027, 1, 12, 23, 59, 59))).toBe(100);
   });
 
   it('keeps the odd/even rule intact around the clock change', () => {
-    expect(numbers(local(2026, 10, 25, 12))).toContain(10); // day 25, odd
-    expect(numbers(local(2026, 10, 26, 12))).not.toContain(10); // day 26, even
-    expect(numbers(local(2026, 10, 27, 12))).toContain(10); // day 27, odd
+    expect(numbers(local(2026, 10, 25, 12))).toContain(10); // day 21, odd
+    expect(numbers(local(2026, 10, 26, 12))).not.toContain(10); // day 22, even
+    expect(numbers(local(2026, 10, 27, 12))).toContain(10); // day 23, odd
   });
 
   it('blocks on the clock-change day still start at local wall-clock time', () => {
@@ -81,19 +82,20 @@ inZone('America/Toronto', () => {
   });
 
   it('counts day numbers by calendar date across the clock change', () => {
-    expect(getDayNumber(local(2026, 10, 31, 23, 59, 59))).toBe(31);
-    expect(getDayNumber(local(2026, 11, 1, 0, 0, 0))).toBe(32);
-    expect(getDayNumber(local(2026, 11, 1, 1, 30))).toBe(32);
-    expect(getDayNumber(local(2026, 11, 1, 23, 59, 59))).toBe(32);
-    expect(getDayNumber(local(2026, 11, 2, 0, 0, 0))).toBe(33);
-    expect(getDayNumber(local(2026, 11, 2, 12))).toBe(33);
-    expect(getDayNumber(local(2026, 12, 31, 23, 59, 59))).toBe(92);
+    expect(getDayNumber(local(2026, 10, 31, 23, 59, 59))).toBe(27);
+    expect(getDayNumber(local(2026, 11, 1, 0, 0, 0))).toBe(28);
+    expect(getDayNumber(local(2026, 11, 1, 1, 30))).toBe(28);
+    expect(getDayNumber(local(2026, 11, 1, 23, 59, 59))).toBe(28);
+    expect(getDayNumber(local(2026, 11, 2, 0, 0, 0))).toBe(29);
+    expect(getDayNumber(local(2026, 11, 2, 12))).toBe(29);
+    expect(getDayNumber(local(2026, 12, 31, 23, 59, 59))).toBe(88);
+    expect(getDayNumber(local(2027, 1, 12, 12))).toBe(100);
   });
 
   it('keeps the odd/even rule intact around the clock change', () => {
-    expect(numbers(local(2026, 10, 31, 12))).toContain(10); // day 31
-    expect(numbers(local(2026, 11, 1, 12))).not.toContain(10); // day 32
-    expect(numbers(local(2026, 11, 2, 12))).toContain(10); // day 33
+    expect(numbers(local(2026, 10, 31, 12))).toContain(10); // day 27
+    expect(numbers(local(2026, 11, 1, 12))).not.toContain(10); // day 28
+    expect(numbers(local(2026, 11, 2, 12))).toContain(10); // day 29
   });
 });
 
@@ -101,8 +103,8 @@ inZone('Asia/Bangkok', () => {
   it('has no clock change and the same day numbers', () => {
     const hours = (local(2026, 10, 26).getTime() - local(2026, 10, 25).getTime()) / 3_600_000;
     expect(hours).toBe(24);
-    expect(getDayNumber(local(2026, 10, 25))).toBe(25);
-    expect(getDayNumber(local(2026, 11, 1))).toBe(32);
+    expect(getDayNumber(local(2026, 10, 25))).toBe(21);
+    expect(getDayNumber(local(2026, 11, 1))).toBe(28);
   });
 });
 
@@ -111,36 +113,37 @@ inZone('Asia/Bangkok', () => {
 inZone('Europe/Dublin', () => {
   describe('program window', () => {
     it('reports before / active / after', () => {
-      expect(getProgramStatus(local(2026, 9, 30, 23, 59, 59))).toBe('before');
-      expect(getProgramStatus(local(2026, 10, 1))).toBe('active');
-      expect(getProgramStatus(local(2026, 12, 31, 23, 59, 59))).toBe('active');
-      expect(getProgramStatus(local(2027, 1, 1))).toBe('after');
+      expect(getProgramStatus(local(2026, 10, 4, 23, 59, 59))).toBe('before');
+      expect(getProgramStatus(local(2026, 10, 5))).toBe('active');
+      expect(getProgramStatus(local(2027, 1, 12, 23, 59, 59))).toBe('active');
+      expect(getProgramStatus(local(2027, 1, 13))).toBe('after');
     });
 
     it('formats the header', () => {
-      expect(formatHeaderDate(local(2026, 10, 1))).toBe('Thu 1 Oct');
-      expect(formatProgramDay(local(2026, 10, 1))).toBe('Day 1 of 92');
-      expect(formatProgramDay(local(2026, 12, 31))).toBe('Day 92 of 92');
-      expect(formatProgramDay(local(2026, 9, 30))).toBe('Program starts 1 Oct');
-      expect(formatProgramDay(local(2027, 1, 1))).toBe('Program complete');
+      expect(formatHeaderDate(local(2026, 10, 5))).toBe('Mon 5 Oct');
+      expect(formatHeaderDate(local(2027, 1, 12))).toBe('Tue 12 Jan');
+      expect(formatProgramDay(local(2026, 10, 5))).toBe('Day 1 of 100');
+      expect(formatProgramDay(local(2027, 1, 12))).toBe('Day 100 of 100');
+      expect(formatProgramDay(local(2026, 10, 4))).toBe('Program starts 5 Oct');
+      expect(formatProgramDay(local(2027, 1, 13))).toBe('Program complete');
     });
 
     it('still builds a routine outside the program window', () => {
-      expect(getBlocksForDate(local(2026, 9, 30)).length).toBeGreaterThan(0);
-      expect(getBlocksForDate(local(2027, 1, 1)).length).toBeGreaterThan(0);
+      expect(getBlocksForDate(local(2026, 10, 4)).length).toBeGreaterThan(0);
+      expect(getBlocksForDate(local(2027, 1, 13)).length).toBeGreaterThan(0);
     });
   });
 
   describe('odd and even days', () => {
     it('day 1 (odd) has all 14 blocks including bike / row', () => {
-      expect(numbers(local(2026, 10, 1))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
-      const b9 = getBlocksForDate(local(2026, 10, 1)).find((b) => b.number === 9)!;
+      expect(numbers(local(2026, 10, 5))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+      const b9 = getBlocksForDate(local(2026, 10, 5)).find((b) => b.number === 9)!;
       expect(b9.title).toBe('Deep work 3 - Sink as the operator');
       expect(b9.endLabel).toBe('17:15');
     });
 
     it('day 2 (even) drops block 10 and extends block 9 to 18:30', () => {
-      const blocks = getBlocksForDate(local(2026, 10, 2));
+      const blocks = getBlocksForDate(local(2026, 10, 6));
       expect(blocks.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]);
       const b9 = blocks.find((b) => b.number === 9)!;
       expect(b9.title).toBe(EXTENDED_TITLE);
@@ -153,20 +156,22 @@ inZone('Europe/Dublin', () => {
     });
 
     it('counts by program day, not by odd calendar date', () => {
-      expect(numbers(local(2026, 11, 1))).not.toContain(10); // 1 Nov is day 32
-      expect(numbers(local(2026, 11, 2))).toContain(10); // 2 Nov is day 33
-      expect(numbers(local(2026, 12, 31))).not.toContain(10); // day 92
+      expect(numbers(local(2026, 10, 5))).toContain(10); // day 1
+      expect(numbers(local(2026, 10, 6))).not.toContain(10); // day 2
+      expect(numbers(local(2026, 11, 1))).not.toContain(10); // 1 Nov is day 28
+      expect(numbers(local(2026, 11, 2))).toContain(10); // 2 Nov is day 29
+      expect(numbers(local(2027, 1, 12))).not.toContain(10); // day 100
     });
 
     it('block 9 is the current block at 18:00 on an even day', () => {
-      const now = local(2026, 10, 2, 18, 0, 0);
+      const now = local(2026, 10, 6, 18, 0, 0);
       const cur = getCurrentBlock(getBlocksForDate(now), now);
       expect(cur.number).toBe(9);
       expect(cur.title).toBe(EXTENDED_TITLE);
     });
 
     it('block 10 is the current block at 18:00 on an odd day', () => {
-      const now = local(2026, 10, 3, 18, 0, 0);
+      const now = local(2026, 10, 7, 18, 0, 0);
       expect(getCurrentBlock(getBlocksForDate(now), now).number).toBe(10);
     });
   });
