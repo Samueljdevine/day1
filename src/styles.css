@@ -92,6 +92,20 @@ button { cursor: pointer; }
   -webkit-user-select: none;
 }
 
+.header-left { display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--fg);
+}
+
 /* ---------- Program progress (day N of 100) ---------- */
 .program-bar {
   flex-shrink: 0;
@@ -443,6 +457,133 @@ input[type="checkbox"] {
   .day { min-height: 80px; }
 }
 
+/* ---------- Full-day plan overlay ---------- */
+.plan {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--bg);
+  color: var(--fg);
+  animation: plan-in 180ms ease-out;
+}
+.plan[hidden] { display: none; }
+@keyframes plan-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .plan { animation: none; } }
+
+.plan-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.plan-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.plan-title { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; }
+.plan-sub { font-size: 14px; font-weight: 600; color: var(--fg-muted); margin-top: 2px; }
+
+.plan-body { flex: 1 1 0; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 16px; }
+.plan-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.plan-row { display: grid; grid-template-columns: 44px 1fr; gap: 8px; }
+.plan-time {
+  padding-top: 7px;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 9px 12px 10px;
+  border-radius: 14px;
+  background: var(--pc-bg, var(--input-bg));
+  color: var(--pc-fg, var(--fg-muted));
+  overflow: hidden;
+}
+.plan-card.compact { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; padding-bottom: 6px; }
+.plan-card[data-category="deep"]  { --pc-bg: var(--deep-fill);  --pc-fg: var(--deep-text); }
+.plan-card[data-category="train"] { --pc-bg: var(--train-fill); --pc-fg: var(--train-text); }
+.plan-card[data-category="learn"] { --pc-bg: var(--learn-fill); --pc-fg: var(--learn-text); }
+.plan-card[data-category="fuel"]  { --pc-bg: var(--fuel-fill);  --pc-fg: var(--fuel-text); }
+.plan-card[data-category="light"] { --pc-bg: var(--light-fill); --pc-fg: var(--light-text); }
+.plan-card[data-category="rest"]  { --pc-bg: var(--rest-fill);  --pc-fg: var(--rest-text); }
+
+.plan-t { font-size: 16.5px; font-weight: 700; line-height: 1.2; }
+.plan-m { flex: 0 0 auto; font-size: 12.5px; font-weight: 600; opacity: 0.85; font-variant-numeric: tabular-nums; }
+.plan-n { margin-top: 3px; font-size: 13px; line-height: 1.3; opacity: 0.85; }
+.plan-badge {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--pc-fg);
+  color: var(--pc-bg);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.plan-badge { white-space: nowrap; }
+.plan-card.compact .plan-badge { margin-top: 0; align-self: center; order: 3; }
+/* In a short current block the badge replaces the time label so the title keeps its room. */
+.plan-row.current .plan-card.compact .plan-m { display: none; }
+.plan-card.compact .plan-m { order: 2; margin-left: auto; }
+/* Elapsed part of the current block, as a bar down the card's left edge. */
+.plan-now {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  background: var(--pc-fg);
+  pointer-events: none;
+}
+.plan-row.current .plan-card { padding-left: 16px; }
+.plan-card.compact .plan-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plan-row.past .plan-card { opacity: 0.45; }
+.plan-row.current .plan-card { outline: 2.5px solid var(--pc-fg); outline-offset: -2.5px; }
+.plan-row.current .plan-time { color: var(--fg); }
+.plan-row.done .plan-t { text-decoration: line-through; }
+.plan-sleep .plan-card { border: 1px dashed var(--line); background: transparent; }
+
+.plan-totals {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.plan-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--pc-bg);
+  color: var(--pc-fg);
+}
+.plan-chip strong { font-weight: 800; font-variant-numeric: tabular-nums; }
+.plan-chip[data-category="deep"]  { --pc-bg: var(--deep-fill);  --pc-fg: var(--deep-text); }
+.plan-chip[data-category="train"] { --pc-bg: var(--train-fill); --pc-fg: var(--train-text); }
+.plan-chip[data-category="learn"] { --pc-bg: var(--learn-fill); --pc-fg: var(--learn-text); }
+.plan-chip[data-category="fuel"]  { --pc-bg: var(--fuel-fill);  --pc-fg: var(--fuel-text); }
+.plan-chip[data-category="light"] { --pc-bg: var(--light-fill); --pc-fg: var(--light-text); }
+.plan-chip[data-category="rest"]  { --pc-bg: var(--rest-fill);  --pc-fg: var(--rest-text); }
+
 /* ---------- Sleep state ---------- */
 body.sleep { background: #000; color: #555; }
 body.sleep #app { background: #000; }
@@ -452,6 +593,9 @@ body.sleep .now .bar-fill { background: #333; }
 body.sleep .header, body.sleep .next, body.sleep .top3, body.sleep .learn,
 body.sleep .day, body.sleep .footer, body.sleep .strip, body.sleep .program-bar { opacity: 0.35; }
 body.sleep .day-head { background: #000; }
+body.sleep .icon-btn { background: #0a0a0a; border-color: #222; color: #888; }
+body.sleep .plan { background: #000; color: #9a9a9a; }
+body.sleep .plan-card, body.sleep .plan-chip { opacity: 0.6; }
 body.sleep .strip-marker { box-shadow: none; }
 body.sleep .day-row.current { background: #111; outline-color: #333; }
 body.sleep input[type="text"], body.sleep .pill { background: #0a0a0a; border-color: #222; color: #777; }

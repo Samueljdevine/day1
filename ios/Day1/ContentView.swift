@@ -11,6 +11,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var scheme
     @FocusState private var focus: EditField?
     @State private var confirmReset = false
+    @State private var showPlan = false
 
     var body: some View {
         TimelineView(.everyMinute) { context in
@@ -66,6 +67,9 @@ struct ContentView: View {
             .onAppear { model.ensureDate(now) }
             .onChange(of: now) { _, newValue in model.ensureDate(newValue) }
         }
+        .fullScreenCover(isPresented: $showPlan) {
+            DayPlanView(done: model.done)
+        }
         .confirmationDialog("Clear today's checkboxes?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Reset today", role: .destructive) { model.resetToday() }
             Button("Cancel", role: .cancel) {}
@@ -78,8 +82,18 @@ struct ContentView: View {
 
     private func header(now: Date) -> some View {
         VStack(spacing: 6) {
-            HStack {
+            HStack(spacing: 10) {
                 Text(Routine.headerDate(now))
+                Button {
+                    showPlan = true
+                } label: {
+                    Image(systemName: "calendar.day.timeline.left")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(width: 34, height: 34)
+                        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Show today's schedule")
                 Spacer()
                 Text(Routine.programDay(now))
             }

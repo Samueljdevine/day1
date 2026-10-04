@@ -1,6 +1,14 @@
 import './styles.css';
 import { registerSW } from 'virtual:pwa-register';
-import { CATEGORIES, LEARNING_LOG_BLOCK, PROGRAM_DAYS, TOMORROW_TOP3_BLOCK } from './schedule';
+import {
+  CATEGORIES,
+  LEARNING_LOG_BLOCK,
+  LIGHTS_OUT,
+  PROGRAM_DAYS,
+  TOMORROW_TOP3_BLOCK,
+  WAKE,
+  type Category,
+} from './schedule';
 import {
   addDays,
   formatBlockTitle,
@@ -70,6 +78,13 @@ const dayList = $('day-list');
 const wakeBtn = $<HTMLButtonElement>('wake-btn');
 const alertsBtn = $<HTMLButtonElement>('alerts-btn');
 const resetLink = $('reset-link');
+const planBtn = $<HTMLButtonElement>('plan-btn');
+const plan = $('plan');
+const planSub = $('plan-sub');
+const planBody = $('plan-body');
+const planList = $('plan-list');
+const planTotals = $('plan-totals');
+const planClose = $<HTMLButtonElement>('plan-close');
 
 // ---------- State ----------
 let builtDateKey = '';
@@ -85,6 +100,7 @@ let stripSegs: { el: HTMLElement; block: Block }[] = [];
 let stripMarker: HTMLElement | null = null;
 let stripRange: { start: number; end: number } = { start: 0, end: 1 };
 let wakeOn = false;
+let planRows: { el: HTMLElement; block: Block; nowLine: HTMLElement; badge: HTMLElement }[] = [];
 let wakeLock: WakeLockSentinel | null = null;
 
 // ---------- Render ----------
@@ -102,6 +118,7 @@ function render(): void {
     buildDayList(blocks, dateKey);
     buildStrip(blocks);
     renderStreak(now);
+    if (!plan.hidden) buildPlan(blocks, now);
   }
 
   const header = `${formatHeaderDate(now)}|${formatProgramDay(now)}`;
@@ -124,6 +141,7 @@ function render(): void {
   renderNext(next);
   updateDayList(live, now);
   updateStrip(live, now);
+  if (!plan.hidden) updatePlan(now);
 }
 
 function renderNow(shown: Block, live: Block, now: Date): void {
@@ -392,6 +410,146 @@ function startPreview(block: Block): void {
   }, PREVIEW_MS);
   render();
 }
+
+// ---------- Full-day plan overlay ----------
+const PLAN_PX_PER_MIN = 1.05;
+const PLAN_MIN_HEIGHT = 46;
+
+function buildPlan(blocks: Block[], now: Date): void {
+  planSub.textContent = `${formatHeaderDate(now)} · ${formatProgramDay(now)}`;
+  planList.innerHTML = '';
+  planRows = [];
+  const dateKey = toDateKey(now);
+  const totals = new Map<Category, number>();
+
+  for (const block of blocks) {
+    const ms = block.end.getTime() - block.start.getTime();
+    const mins = ms / 60000;
+    totals.set(block.category, (totals.get(block.category) ?? 0) + ms);
+
+    const li = document.createElement('li');
+    li.className = 'plan-row';
+    li.classList.toggle('done', isBlockDone(dateKey, block.number));
+
+    const time = document.createElement('div');
+    time.className = 'plan-time';
+    time.textContent = block.startLabel;
+
+    const card = document.createElement('div');
+    card.className = 'plan-card';
+    card.dataset.category = block.category;
+    card.classList.toggle('compact', mins <= 30);
+    card.style.minHeight = `${Math.max(PLAN_MIN_HEIGHT, Math.round(mins * PLAN_PX_PER_MIN))}px`;
+
+    const title = document.createElement('div');
+    title.className = 'plan-t';
+    title.textContent = formatBlockTitle(block);
+
+    const meta = document.createElement('div');
+    meta.className = 'plan-m';
+    meta.textContent =
+      mins <= 30
+        ? `to ${block.endLabel} · ${formatDuration(ms)}`
+        : `${block.startLabel}–${block.endLabel} · ${formatDuration(ms)}`;
+
+    const badge = document.createElement('span');
+    badge.className = 'plan-badge';
+    badge.hidden = true;
+
+    const nowLine = document.createElement('div');
+    nowLine.className = 'plan-now';
+    nowLine.hidden = true;
+
+    card.append(title, meta);
+    if (mins >= 45) {
+      const note = document.createElement('div');
+      note.className = 'plan-n';
+      note.textContent = block.note;
+      card.append(note);
+    }
+    card.append(badge, nowLine);
+    li.append(time, card);
+    planList.append(li);
+    planRows.push({ el: li, block, nowLine, badge });
+  }
+
+  // Sleep closes the day.
+  const [lh, lm] = LIGHTS_OUT.split(':').map(Number);
+  const [wh, wm] = WAKE.split(':').map(Number);
+  const sleepMins = 24 * 60 - (lh * 60 + lm) + wh * 60 + wm;
+  const sleep = document.createElement('li');
+  sleep.className = 'plan-row plan-sleep';
+  const sTime = document.createElement('div');
+  sTime.className = 'plan-time';
+  sTime.textContent = LIGHTS_OUT;
+  const sCard = document.createElement('div');
+  sCard.className = 'plan-card compact';
+  sCard.style.minHeight = `${PLAN_MIN_HEIGHT}px`;
+  const sTitle = document.createElement('div');
+  sTitle.className = 'plan-t';
+  sTitle.textContent = 'Sleep';
+  const sMeta = document.createElement('div');
+  sMeta.className = 'plan-m';
+  sMeta.textContent = `${LIGHTS_OUT}–${WAKE} · ${formatDuration(sleepMins * 60000)}`;
+  sCard.append(sTitle, sMeta);
+  sleep.append(sTime, sCard);
+  planList.append(sleep);
+
+  planTotals.innerHTML = '';
+  for (const key of Object.keys(CATEGORIES) as Category[]) {
+    const ms = totals.get(key);
+    if (!ms) continue;
+    const chip = document.createElement('span');
+    chip.className = 'plan-chip';
+    chip.dataset.category = key;
+    const name = document.createElement('span');
+    name.textContent = CATEGORIES[key].label;
+    const value = document.createElement('strong');
+    value.textContent = formatDuration(ms);
+    chip.append(name, value);
+    planTotals.append(chip);
+  }
+}
+
+function updatePlan(now: Date): void {
+  const t = now.getTime();
+  for (const { el, block, nowLine, badge } of planRows) {
+    const start = block.start.getTime();
+    const end = block.end.getTime();
+    const isCurrent = start <= t && t < end;
+    el.classList.toggle('current', isCurrent);
+    el.classList.toggle('past', t >= end);
+    nowLine.hidden = !isCurrent;
+    badge.hidden = !isCurrent;
+    if (isCurrent) {
+      nowLine.style.height = `${(((t - start) / (end - start)) * 100).toFixed(2)}%`;
+      const text = `Now · ${formatRemaining(end - t)} left`;
+      if (badge.textContent !== text) badge.textContent = text;
+    }
+  }
+}
+
+function openPlan(): void {
+  const now = new Date();
+  buildPlan(getBlocksForDate(now), now);
+  plan.hidden = false;
+  updatePlan(now);
+  const current = planRows.find((r) => r.el.classList.contains('current'));
+  if (current) current.el.scrollIntoView({ block: 'center' });
+  else planBody.scrollTop = now.getHours() >= 12 ? planBody.scrollHeight : 0;
+  planClose.focus();
+}
+
+function closePlan(): void {
+  plan.hidden = true;
+  planBtn.focus();
+}
+
+planBtn.addEventListener('click', openPlan);
+planClose.addEventListener('click', closePlan);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !plan.hidden) closePlan();
+});
 
 // ---------- Footer: wake lock ----------
 async function acquireWakeLock(): Promise<void> {
