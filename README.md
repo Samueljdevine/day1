@@ -86,8 +86,8 @@ After the first load the service worker caches everything, so the app opens and 
 - **Now card:** current block, time remaining (updates every second, exact at boundaries), "until HH:MM", progress bar, block note. Under five minutes the countdown pulses and the bar turns amber. No sound.
 - **Sleep state:** between 22:00 and 05:00 the screen dims to near-black and counts down to 05:00.
 - **Next row:** the next block and its start time.
-- **Top 3 for today:** three inputs with done ticks, saved as you type under `top3:<YYYY-MM-DD>`. During block 13 (20:00–21:00) a second set, "Tomorrow's top 3", saves under tomorrow's date so block 1 shows it the next morning.
-- **Learning log:** during block 12 (19:15–20:00) a one-line "What did you learn?" field saves under `learn:<YYYY-MM-DD>`. The streak line counts consecutive days with an entry, ending today or yesterday.
+- **Top 3 for today:** three inputs with done ticks, saved as you type under `top3:<YYYY-MM-DD>`. During block 14 (20:00–21:30) a second set, "Tomorrow's top 3", saves under tomorrow's date so block 1 shows it the next morning.
+- **Learning log:** during block 13 (19:15–20:00) a one-line "What did you learn?" field saves under `learn:<YYYY-MM-DD>`. The streak line counts consecutive days with an entry, ending today or yesterday.
 - **Full day list:** every block with times and a done checkbox (`done:<YYYY-MM-DD>:<block>`). Current block highlighted, past blocks dimmed. Tap a block to preview it in the Now card for five seconds.
 - **Keep screen awake:** uses the Screen Wake Lock API. The toggle is hidden on browsers that do not support it.
 - **Reset today:** clears today's block checkboxes and top-3 ticks after a confirm. Text is kept.
@@ -95,7 +95,7 @@ After the first load the service worker caches everything, so the app opens and 
 
 ## Block alerts (best effort)
 
-"Enable block alerts" asks for notification permission (only when you tap it, never on load). While the app is open it schedules one local notification for the start of every remaining block today, for example "Block 07 · Calls + partners" / "until 15:15". Timers are rebuilt each time the app comes back to the foreground.
+"Enable block alerts" asks for notification permission (only when you tap it, never on load). While the app is open it schedules one local notification for the start of every remaining block today, for example "Block 07 · Admin, travel + calls" / "until 13:00". Timers are rebuilt each time the app comes back to the foreground.
 
 Limits to be aware of:
 

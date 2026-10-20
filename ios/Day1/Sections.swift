@@ -197,7 +197,7 @@ struct DayStrip: View {
     }
 }
 
-/// "TODAY            3 OF 14 DONE"
+/// "TODAY            3 OF 15 DONE"
 struct DayHeader: View {
     let done: Int
     let total: Int

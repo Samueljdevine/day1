@@ -36,7 +36,7 @@ const local = (y: number, m: number, d: number, hh = 0, mm = 0, ss = 0): Date =>
   new Date(y, m - 1, d, hh, mm, ss, 0);
 
 const numbers = (date: Date): number[] => getBlocksForDate(date).map((b) => b.number);
-const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 // ---------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ inZone('Europe/Dublin', () => {
     expect(getDayNumber(local(2027, 1, 12, 23, 59, 59))).toBe(100);
   });
 
-  it('has the same 14 blocks on both sides of the clock change', () => {
+  it('has the same 15 blocks on both sides of the clock change', () => {
     expect(numbers(local(2026, 10, 24, 12))).toEqual(ALL);
     expect(numbers(local(2026, 10, 25, 12))).toEqual(ALL);
     expect(numbers(local(2026, 10, 26, 12))).toEqual(ALL);
@@ -92,7 +92,7 @@ inZone('America/Toronto', () => {
     expect(getDayNumber(local(2027, 1, 12, 12))).toBe(100);
   });
 
-  it('has the same 14 blocks on both sides of the clock change', () => {
+  it('has the same 15 blocks on both sides of the clock change', () => {
     expect(numbers(local(2026, 10, 31, 12))).toEqual(ALL);
     expect(numbers(local(2026, 11, 1, 12))).toEqual(ALL);
     expect(numbers(local(2026, 11, 2, 12))).toEqual(ALL);
@@ -135,30 +135,30 @@ inZone('Europe/Dublin', () => {
   });
 
   describe('every day is identical', () => {
-    it('has all 14 blocks on odd and even program days', () => {
+    it('has all 15 blocks on odd and even program days', () => {
       expect(numbers(local(2026, 10, 5))).toEqual(ALL); // day 1
       expect(numbers(local(2026, 10, 6))).toEqual(ALL); // day 2
       expect(numbers(local(2027, 1, 12))).toEqual(ALL); // day 100
       expect(numbers(local(2026, 10, 4))).toEqual(ALL); // before the program
     });
 
-    it('block 9 always ends at 17:15 and block 10 is Ironman prep until 18:30', () => {
+    it('block 10 always ends at 17:15 and block 11 is Ironman prep until 18:30', () => {
       for (const day of [5, 6]) {
         const blocks = getBlocksForDate(local(2026, 10, day));
-        const b9 = blocks.find((b) => b.number === 9)!;
-        expect(b9.title).toBe('Deep work 3 - Sink as the operator');
-        expect(b9.endLabel).toBe('17:15');
         const b10 = blocks.find((b) => b.number === 10)!;
-        expect(b10.title).toBe('Ironman prep');
-        expect(b10.startLabel).toBe('17:15');
-        expect(b10.endLabel).toBe('18:30');
+        expect(b10.title).toBe('Deep work 4 - Open focus');
+        expect(b10.endLabel).toBe('17:15');
+        const b11 = blocks.find((b) => b.number === 11)!;
+        expect(b11.title).toBe('Ironman prep');
+        expect(b11.startLabel).toBe('17:15');
+        expect(b11.endLabel).toBe('18:30');
       }
     });
 
     it('Ironman prep is the current block at 18:00 on consecutive days', () => {
       for (const day of [5, 6, 7]) {
         const now = local(2026, 10, day, 18, 0, 0);
-        expect(getCurrentBlock(getBlocksForDate(now), now).number).toBe(10);
+        expect(getCurrentBlock(getBlocksForDate(now), now).number).toBe(11);
       }
     });
   });
@@ -198,9 +198,9 @@ inZone('Europe/Dublin', () => {
       expect(wake.number).toBe(1);
     });
 
-    it('is block 14 at 21:59:59', () => {
+    it('is block 15 at 21:59:59', () => {
       const b = at(21, 59, 59);
-      expect(b.number).toBe(14);
+      expect(b.number).toBe(15);
       expect(b.isSleep).toBe(false);
     });
 
@@ -221,14 +221,14 @@ inZone('Europe/Dublin', () => {
       expect(at(10, 30, 0)).toBe(6);
     });
 
-    it('19:14:59 is block 11, 19:15:00 is block 12', () => {
-      expect(at(19, 14, 59)).toBe(11);
-      expect(at(19, 15, 0)).toBe(12);
+    it('19:14:59 is block 12, 19:15:00 is block 13', () => {
+      expect(at(19, 14, 59)).toBe(12);
+      expect(at(19, 15, 0)).toBe(13);
     });
 
-    it('19:59:59 is block 12, 20:00:00 is block 13', () => {
-      expect(at(19, 59, 59)).toBe(12);
-      expect(at(20, 0, 0)).toBe(13);
+    it('19:59:59 is block 13, 20:00:00 is block 14', () => {
+      expect(at(19, 59, 59)).toBe(13);
+      expect(at(20, 0, 0)).toBe(14);
     });
 
     it('a block with 999ms left is still that block', () => {
@@ -247,7 +247,7 @@ inZone('Europe/Dublin', () => {
       const n = nextAt(12, 0);
       expect(n.number).toBe(7);
       expect(n.startLabel).toBe('12:30');
-      expect(n.title).toBe('Calls + partners');
+      expect(n.title).toBe('Admin, travel + calls');
     });
 
     it('is Sleep at 22:00 during wind down', () => {

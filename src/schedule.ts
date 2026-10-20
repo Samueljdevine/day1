@@ -28,9 +28,9 @@ export const WAKE = '05:00';
 export const LIGHTS_OUT = '22:00';
 
 /** Block during which "Tomorrow's top 3" inputs are shown. */
-export const TOMORROW_TOP3_BLOCK = 13;
+export const TOMORROW_TOP3_BLOCK = 14;
 /** Block during which the learning log input is shown. */
-export const LEARNING_LOG_BLOCK = 12;
+export const LEARNING_LOG_BLOCK = 13;
 
 export const BLOCKS: readonly BlockDef[] = [
   {
@@ -58,35 +58,39 @@ export const BLOCKS: readonly BlockDef[] = [
     note: 'Full effort, includes shower. Lunch on the go straight after.',
   },
   {
-    number: 7, start: '12:30', end: '15:15', title: 'Calls + partners', category: 'light',
-    note: 'All meetings batched here: family partners, planners, architects, suppliers.',
+    number: 7, start: '12:30', end: '13:00', title: 'Admin, travel + calls', category: 'light',
+    note: 'Clear messages, quick calls, travel back. Lunch on the go.',
   },
   {
-    number: 8, start: '15:15', end: '15:30', title: 'Walk reset', category: 'rest',
-    note: 'Outside, no phone. Resets focus for the afternoon.',
-  },
-  {
-    number: 9, start: '15:30', end: '17:15', title: 'Deep work 3 - Sink as the operator', category: 'deep',
+    number: 8, start: '13:00', end: '15:15', title: 'Deep work 3 - Sink as the operator', category: 'deep',
     note: 'Management model, brand, systems and SOPs that let Sink run the farm and padel.',
   },
   {
-    number: 10, start: '17:15', end: '18:30', title: 'Ironman prep', category: 'train',
+    number: 9, start: '15:15', end: '15:45', title: 'Walk dogs + reset', category: 'rest',
+    note: 'Outside with the dogs, no phone. Resets focus for the afternoon.',
+  },
+  {
+    number: 10, start: '15:45', end: '17:15', title: 'Deep work 4 - Open focus', category: 'deep',
+    note: 'Finish what Deep work 3 started, or the next Sink / farm task. Partner meetings only if they need a long slot.',
+  },
+  {
+    number: 11, start: '17:15', end: '18:30', title: 'Ironman prep', category: 'train',
     note: 'Ironman prep 17:30 - 18:30, includes shower.',
   },
   {
-    number: 11, start: '18:30', end: '19:15', title: 'Dinner', category: 'fuel',
+    number: 12, start: '18:30', end: '19:15', title: 'Dinner', category: 'fuel',
     note: 'Sit-down meal, finished by 19:15 to protect sleep.',
   },
   {
-    number: 12, start: '19:15', end: '20:00', title: 'Deep skill learning', category: 'learn',
+    number: 13, start: '19:15', end: '20:00', title: 'Deep skill learning', category: 'learn',
     note: 'One skill, one course or book, 45 min. No inbox. Log what you learned in one line.',
   },
   {
-    number: 13, start: '20:00', end: '21:00', title: 'Light work + shutdown', category: 'light',
-    note: "Inbox, progress log, write tomorrow's top 3. Workday ends at 21:00.",
+    number: 14, start: '20:00', end: '21:30', title: 'Light work + shutdown', category: 'light',
+    note: "Inbox, progress log, write tomorrow's top 3. Workday ends at 21:30.",
   },
   {
-    number: 14, start: '21:00', end: '22:00', title: 'Wind down', category: 'rest',
+    number: 15, start: '21:30', end: '22:00', title: 'Wind down', category: 'rest',
     note: 'Screens off, lights low, stretch or read. Lights out 22:00.',
   },
 ];

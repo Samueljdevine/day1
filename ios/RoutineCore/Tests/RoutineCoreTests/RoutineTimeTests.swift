@@ -52,7 +52,7 @@ final class RoutineTimeTests: XCTestCase {
     func testDublinSameBlocksAroundClockChange() {
         let c = cal("Europe/Dublin")
         for day in [24, 25, 26] {
-            XCTAssertEqual(numbers(c, local(c, 2026, 10, day, 12)), Array(1...14))
+            XCTAssertEqual(numbers(c, local(c, 2026, 10, day, 12)), Array(1...15))
         }
     }
 
@@ -89,9 +89,9 @@ final class RoutineTimeTests: XCTestCase {
 
     func testTorontoSameBlocksAroundClockChange() {
         let c = cal("America/Toronto")
-        XCTAssertEqual(numbers(c, local(c, 2026, 10, 31, 12)), Array(1...14))
-        XCTAssertEqual(numbers(c, local(c, 2026, 11, 1, 12)), Array(1...14))
-        XCTAssertEqual(numbers(c, local(c, 2026, 11, 2, 12)), Array(1...14))
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 31, 12)), Array(1...15))
+        XCTAssertEqual(numbers(c, local(c, 2026, 11, 1, 12)), Array(1...15))
+        XCTAssertEqual(numbers(c, local(c, 2026, 11, 2, 12)), Array(1...15))
     }
 
     // MARK: Asia/Bangkok, no clock change
@@ -154,23 +154,23 @@ final class RoutineTimeTests: XCTestCase {
 
     func testEveryDayHasAllFourteenBlocks() {
         let c = dublin
-        XCTAssertEqual(numbers(c, local(c, 2026, 10, 5)), Array(1...14)) // day 1
-        XCTAssertEqual(numbers(c, local(c, 2026, 10, 6)), Array(1...14)) // day 2
-        XCTAssertEqual(numbers(c, local(c, 2027, 1, 12)), Array(1...14)) // day 100
-        XCTAssertEqual(numbers(c, local(c, 2026, 10, 4)), Array(1...14)) // before the program
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 5)), Array(1...15)) // day 1
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 6)), Array(1...15)) // day 2
+        XCTAssertEqual(numbers(c, local(c, 2027, 1, 12)), Array(1...15)) // day 100
+        XCTAssertEqual(numbers(c, local(c, 2026, 10, 4)), Array(1...15)) // before the program
     }
 
-    func testBlockNineAndIronmanPrepAreTheSameEveryDay() {
+    func testBlockTenAndIronmanPrepAreTheSameEveryDay() {
         let c = dublin
         for day in [5, 6] {
             let blocks = Routine.blocks(for: local(c, 2026, 10, day), calendar: c)
-            let b9 = blocks.first { $0.number == 9 }!
-            XCTAssertEqual(b9.title, "Deep work 3 - Sink as the operator")
-            XCTAssertEqual(b9.endLabel, "17:15")
             let b10 = blocks.first { $0.number == 10 }!
-            XCTAssertEqual(b10.title, "Ironman prep")
-            XCTAssertEqual(b10.startLabel, "17:15")
-            XCTAssertEqual(b10.endLabel, "18:30")
+            XCTAssertEqual(b10.title, "Deep work 4 - Open focus")
+            XCTAssertEqual(b10.endLabel, "17:15")
+            let b11 = blocks.first { $0.number == 11 }!
+            XCTAssertEqual(b11.title, "Ironman prep")
+            XCTAssertEqual(b11.startLabel, "17:15")
+            XCTAssertEqual(b11.endLabel, "18:30")
         }
     }
 
@@ -179,7 +179,7 @@ final class RoutineTimeTests: XCTestCase {
         let c = dublin
         for day in [5, 6, 7] {
             let now = local(c, 2026, 10, day, 18, 0, 0)
-            XCTAssertEqual(Routine.currentBlock(in: Routine.blocks(for: now, calendar: c), at: now, calendar: c).number, 10)
+            XCTAssertEqual(Routine.currentBlock(in: Routine.blocks(for: now, calendar: c), at: now, calendar: c).number, 11)
         }
     }
 
@@ -223,9 +223,9 @@ final class RoutineTimeTests: XCTestCase {
         XCTAssertEqual(wake.number, 1)
     }
 
-    func testBlockFourteenAt215959() {
+    func testBlockFifteenAt215959() {
         let b = at(21, 59, 59)
-        XCTAssertEqual(b.number, 14)
+        XCTAssertEqual(b.number, 15)
         XCTAssertFalse(b.isSleep)
     }
 
@@ -248,13 +248,13 @@ final class RoutineTimeTests: XCTestCase {
     }
 
     func testBoundary1915() {
-        XCTAssertEqual(numberAt(19, 14, 59), 11)
-        XCTAssertEqual(numberAt(19, 15, 0), 12)
+        XCTAssertEqual(numberAt(19, 14, 59), 12)
+        XCTAssertEqual(numberAt(19, 15, 0), 13)
     }
 
     func testBoundary2000() {
-        XCTAssertEqual(numberAt(19, 59, 59), 12)
-        XCTAssertEqual(numberAt(20, 0, 0), 13)
+        XCTAssertEqual(numberAt(19, 59, 59), 13)
+        XCTAssertEqual(numberAt(20, 0, 0), 14)
     }
 
     func testBlockWithSubSecondLeftIsStillThatBlock() {
@@ -275,7 +275,7 @@ final class RoutineTimeTests: XCTestCase {
         let n = nextAt(12, 0)
         XCTAssertEqual(n.number, 7)
         XCTAssertEqual(n.startLabel, "12:30")
-        XCTAssertEqual(n.title, "Calls + partners")
+        XCTAssertEqual(n.title, "Admin, travel + calls")
     }
 
     func testNextIsSleepDuringWindDown() {
@@ -404,12 +404,12 @@ final class RoutineTimeTests: XCTestCase {
         let c = dublin
         let now = local(c, 2026, 10, 5, 20, 30, 0)
         let upcoming = Routine.upcomingBlocks(from: now, hours: 24, calendar: c)
-        XCTAssertEqual(upcoming.first?.number, 14)
-        XCTAssertEqual(upcoming.first?.start, local(c, 2026, 10, 5, 21, 0, 0))
-        // Block 14 tonight, then tomorrow's blocks 1-13 start by 20:00.
-        // Tomorrow's block 14 at 21:00 is outside the 24 h window.
-        XCTAssertEqual(upcoming.count, 14)
-        XCTAssertEqual(upcoming.last?.number, 13)
-        XCTAssertTrue(upcoming.contains { $0.number == 10 })
+        XCTAssertEqual(upcoming.first?.number, 15)
+        XCTAssertEqual(upcoming.first?.start, local(c, 2026, 10, 5, 21, 30, 0))
+        // Block 15 tonight, then tomorrow's blocks 1-14 start by 20:00.
+        // Tomorrow's block 15 at 21:30 is outside the 24 h window.
+        XCTAssertEqual(upcoming.count, 15)
+        XCTAssertEqual(upcoming.last?.number, 14)
+        XCTAssertTrue(upcoming.contains { $0.number == 11 })
     }
 }

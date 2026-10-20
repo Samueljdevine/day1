@@ -6,3 +6,4 @@ ios/build
 ios/RoutineCore/.build
 xcuserdata
 *.xcuserstate
+ios/build-device
