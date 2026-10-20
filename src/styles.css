@@ -443,7 +443,7 @@ input[type="checkbox"] {
 .pill:disabled:not([aria-pressed="true"]) { opacity: 0.55; }
 .pill-quiet { margin-left: auto; background: transparent; color: var(--fg-muted); }
 
-/* ---------- Tight mode: block 13 shows six inputs ---------- */
+/* ---------- Tight mode: block 14 shows six inputs ---------- */
 #app.tight .now { min-height: 0; padding: 12px 16px 16px; gap: 4px; }
 #app.tight .note { display: none; }
 #app.tight .day { min-height: 64px; }
